@@ -6,13 +6,27 @@ import org.codehaus.jackson.JsonNode;
 
 import play.*;
 import play.mvc.*;
+import play.libs.F.*;
 
 import views.html.*;
+
+import models.*;
 
 public class Application extends Controller {
   
     public static Result index() {
-        return ok(index.render("Jonas"));
+        return ok(index.render());
+    }
+    
+    /**
+     * Display the auction room.
+     */
+    public static Result auctionRoom(String username) {
+        if(username == null || username.trim().equals("")) {
+            flash("error", "Please choose a valid username.");
+            return redirect(routes.Application.index());
+        }
+        return ok(auctionRoom.render(username));
     }
     
     /**

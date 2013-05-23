@@ -1,15 +1,38 @@
-@(title: String)(content: Html)
+@(connected: String)(content: Html)
 
 <!DOCTYPE html>
 
 <html>
     <head>
-        <title>@title</title>
+        <title>Websocket Auction</title>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
     </head>
     <body>
-        @content
+    
+    	<div class="topbar">
+            <div class="fill">
+                <div class="container">
+                    <a class="brand" href="@routes.Application.index()">Websocket Auction</a>
+                    
+                    @if(connected != null) {
+                        <p class="pull-right">
+                            Logged in as @connected —
+                            <a href="@routes.Application.index()">Disconnect</a>
+                        </p>
+                    } else {
+                        <form action="@routes.Application.auctionRoom()" class="pull-right">
+                            <input id="username" name="username" class="input-small" type="text" placeholder="Username">
+                            <button class="btn" type="submit">Sign in</button>
+                        </form>
+                    }
+                    
+                </div>
+            </div>
+        </div>
+        <div class=content>
+          @content
+        </div>
     </body>
 </html>
