@@ -5,12 +5,18 @@
 <div class="objekt">
     <img class="bild" src="cykel.jpg" width="400">
 </div>
+<div id="onError">
+
+</div>
 <div id="output">
   <input type="text" id="currentBid" value="100">
 </div>
 <div id="input">
   <input type="text" id="bid">
   <br><button id="bidButton">Buda</button>
+</div>
+<div id="auctionhistory">
+  <h3>Lagda bud</h3>
 </div>
 
 <script type="text/javascript" charset="utf-8">
@@ -36,8 +42,21 @@
                     $("#onError").show()
                     return
                 } 
+                
                 if (data.kind == 'bid') {
 					$("#currentBid").val(data.message)
+					var el = $('<div class="message"><p></p></div>')
+                    $("span", el).text(data.user)
+                    var today = new Date()
+					var h = today.getHours()
+					var m = today.getMinutes()
+					var s = today.getSeconds()
+					m=checkTime(m);
+					s=checkTime(s);
+                    $("p", el).text(h+":"+m+":"+s+": "+ data.user + " budade " + data.message + " kr.")
+                    $(el).addClass(data.kind)
+                    if(data.user == '@username') $(el).addClass('me')
+                    $('#auctionhistory').append(el)
                 }
             }
             
@@ -54,7 +73,14 @@
             
             $("#bidButton").click(function() {sendMessage()})
             
-            
+            function checkTime(i)
+			{
+			if (i<10)
+			  {
+			  i="0" + i;
+			  }
+			return i;
+			}
             
         })
     

@@ -38,11 +38,8 @@ public class AuctionItem extends UntypedActor {
             // For each event received on the socket,
             in.onMessage(new Callback<JsonNode>() {
                public void invoke(JsonNode event) {
-            	   System.out.println("onMessage - invoke - bud:" + event.asText());
                    // Send a Bid message to the room.
-            	   //defaultItem.tell(new Bid(username, "123"));
-            	   defaultItem.tell(new Bid(username, event.get("bid").asText()));
-            	   System.out.println("onMessage - invoke2");                
+            	   defaultItem.tell(new Bid(username, event.get("bid").asText()));         
                } 
             });
             
