@@ -1,6 +1,7 @@
 package controllers;
 
 import models.AuctionItem;
+import models.AuctionRoom;
 
 import org.codehaus.jackson.JsonNode;
 
@@ -25,8 +26,8 @@ public class Application extends Controller {
         if(username == null || username.trim().equals("")) {
             flash("error", "Please choose a valid username.");
             return redirect(routes.Application.index());
-        }
-        return ok(auctionRoom.render(username));
+        }     
+        return ok(auctionRoom.render(username, AuctionItem.findItem(1L)));
     }
     
     /**
@@ -40,7 +41,7 @@ public class Application extends Controller {
                 System.out.println("onReady");
                 // Join the chat room.
                 try { 
-                    AuctionItem.join(username, in, out);
+                    AuctionRoom.join(username, in, out);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

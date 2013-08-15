@@ -1,4 +1,4 @@
-@(username: String)
+@(username: String, auctionItem: AuctionItem)
 
 @main(username) {
 <h2>Websocket Auction Client</h2>  
@@ -6,9 +6,14 @@
 
 </div>
 <div id="output">
-  <input type="text" id="currentBid" value="100">
+  <label>Vara: @auctionItem.name</label>
+  <br>
+  <label>Nuvarande bud: </label>
+  <input type="text" id="currentBid" value="@auctionItem.price">
 </div>
 <div id="input">
+  <br>
+  <label>Ditt bud:</label>
   <input type="text" id="bid">
   <br><button id="bidButton">Buda</button>
 </div>
