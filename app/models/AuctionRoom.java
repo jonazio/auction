@@ -95,6 +95,8 @@ public class AuctionRoom extends UntypedActor {
             notifyAll("bid", bid.username, bid.bid);
             System.out.println("onReceive - Bid - har notifierat alla");
             
+            // update auctionitem in database TODO
+            
         } else {
             unhandled(message);
         }

@@ -9,6 +9,7 @@ import play.data.validation.Constraints.*;
 import javax.persistence.*;
 
 @Entity
+@Table(name="Auction_Items")
 public class AuctionItem extends Model{
 	
 	@Id
