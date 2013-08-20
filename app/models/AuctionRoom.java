@@ -13,6 +13,7 @@ import static akka.pattern.Patterns.ask;
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -96,6 +97,11 @@ public class AuctionRoom extends UntypedActor {
             System.out.println("onReceive - Bid - har notifierat alla");
             
             // update auctionitem in database TODO
+            auctionItem = new AuctionItem();
+            auctionItem = AuctionItem.findItem(1L); // Fix TODO
+            auctionItem.name = "Gummistövlar"; // Fix TODO
+            auctionItem.price = new BigDecimal(bid.bid);
+            auctionItem.update();
             
         } else {
             unhandled(message);

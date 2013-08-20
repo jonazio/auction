@@ -27,6 +27,7 @@ public class Application extends Controller {
             flash("error", "Please choose a valid username.");
             return redirect(routes.Application.index());
         }     
+        // value is static right now, obviously going to change it when the site grows TODO
         return ok(auctionRoom.render(username, AuctionItem.findItem(1L)));
     }
     
