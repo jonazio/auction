@@ -1,0 +1,15 @@
+@(username: String, items: List[AuctionItem])
+
+@main(username){
+
+
+<div id="listOfItems">
+  <ul>
+      @for(item <- items) {
+        <li>@item.name</li>  
+      }
+  </ul>  
+</div>
+
+
+}

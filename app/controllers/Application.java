@@ -19,6 +19,11 @@ public class Application extends Controller {
         return ok(index.render());
     }
     
+    
+    /**
+     * Display the list of items TODO
+     */
+    
     /**
      * Display the auction room.
      */
@@ -30,6 +35,16 @@ public class Application extends Controller {
         // value is static right now, obviously going to change it when the site grows TODO
         return ok(auctionRoom.render(username, AuctionItem.findItem(1L)));
     }
+    
+    
+    public static Result auctionList(String username){
+        if(username == null || username.trim().equals("")) {
+            flash("error", "Please choose a valid username.");
+            return redirect(routes.Application.index());
+        }    
+        return ok(auctionList.render(username, AuctionItem.all()));
+    }
+    
     
     /**
      * Handle the auction websocket.

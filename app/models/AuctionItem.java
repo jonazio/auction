@@ -35,5 +35,9 @@ public class AuctionItem extends Model{
     public void update (Long id, AuctionItem auctionItem){
     	auctionItem.update(id, auctionItem);
     }
+    
+    public static List<AuctionItem> all() {
+    	return find.all();
+    }
 	
 }
