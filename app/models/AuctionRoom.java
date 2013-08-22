@@ -44,7 +44,7 @@ public class AuctionRoom extends UntypedActor {
             in.onMessage(new Callback<JsonNode>() {
                public void invoke(JsonNode event) {
                    // Send a Bid message to the room.
-            	   defaultItem.tell(new Bid(username, event.get("bid").asText()));         
+            	   defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()));         
                } 
             });
             
@@ -85,7 +85,7 @@ public class AuctionRoom extends UntypedActor {
            //     getSender().tell("This username is already used");
            // } else {
                 members.put(join.username, join.channel);
-                notifyAll("join", join.username, "has entered the room");
+                notifyAll("join", join.username, "has entered the room", 1L);
                 getSender().tell("OK");
            // }
             
@@ -93,13 +93,12 @@ public class AuctionRoom extends UntypedActor {
             // Received a Bid
             Bid bid = (Bid)message;
             
-            notifyAll("bid", bid.username, bid.bid);
+            notifyAll("bid", bid.username, bid.bid, bid.id);
             System.out.println("onReceive - Bid - har notifierat alla");
             
             // update auctionitem in database TODO
             auctionItem = new AuctionItem();
-            auctionItem = AuctionItem.findItem(1L); // Fix TODO
-            auctionItem.name = "Gummistövlar"; // Fix TODO
+            auctionItem = AuctionItem.findItem(bid.id); // Fix TODO
             auctionItem.price = new BigDecimal(bid.bid);
             auctionItem.update();
             
@@ -110,7 +109,7 @@ public class AuctionRoom extends UntypedActor {
     }
     
     // Send a Json event to all members
-    public void notifyAll(String kind, String user, String text) {
+    public void notifyAll(String kind, String user, String text, long id) {
     	System.out.println("notifyAll");
         for(WebSocket.Out<JsonNode> channel: members.values()) {
             
@@ -121,6 +120,8 @@ public class AuctionRoom extends UntypedActor {
             event.put("user", user);
             System.out.println("text " + text);
             event.put("message", text);
+            System.out.println("id " + id);
+            event.put("id", id);
             
             ArrayNode m = event.putArray("members");
             for(String u: members.keySet()) {
@@ -150,10 +151,12 @@ public class AuctionRoom extends UntypedActor {
         
         final String username;
         final String bid;
+        final long id;
         
-        public Bid(String username, String bid) {
+        public Bid(String username, String bid, Long id) {
             this.username = username;
             this.bid = bid;
+            this.id = id;
         }
         
     }

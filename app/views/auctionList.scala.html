@@ -6,7 +6,9 @@
 <div id="listOfItems">
   <ul>
       @for(item <- items) {
-        <li>@item.name</li>  
+        <li>@item.name
+          <a href="@routes.Application.auctionRoom(username, item.id)">Buda</a>
+        </li>  
       }
   </ul>  
 </div>

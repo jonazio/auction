@@ -4,7 +4,8 @@
 
 # Home page
 GET     /                           controllers.Application.index()
-GET		/auction					controllers.Application.auctionRoom(username: String ?= null)
+GET		/auction/:id	            controllers.Application.auctionRoom(username: String ?= null, id: Long)
+GET		/auctionList				controllers.Application.auctionList(username: String ?= null)
 GET     /room/auction               controllers.Application.auction(username)
 
 # Map static resources from the /public folder to the /assets URL path

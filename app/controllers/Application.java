@@ -25,7 +25,7 @@ public class Application extends Controller {
      */
     
     /**
-     * Display the auction room.
+     * Display the auction room. Remove when new solution is working TODO
      */
     public static Result auctionRoom(String username) {
         if(username == null || username.trim().equals("")) {
@@ -34,6 +34,18 @@ public class Application extends Controller {
         }     
         // value is static right now, obviously going to change it when the site grows TODO
         return ok(auctionRoom.render(username, AuctionItem.findItem(1L)));
+    }
+    
+    /**
+     * Display the auction room. 
+     */
+    public static Result auctionRoom(String username, Long id) {
+        if(username == null || username.trim().equals("")) {
+            flash("error", "Please choose a valid username.");
+            return redirect(routes.Application.index());
+        }     
+        // value is static right now, obviously going to change it when the site grows TODO
+        return ok(auctionRoom.render(username, AuctionItem.findItem(id)));
     }
     
     
