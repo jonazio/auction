@@ -1,0 +1,14 @@
+.leftmenu {
+  top: 40px;
+  position: relative;
+  float: left;
+  background-color: lightgray;
+  height: 500px;
+  width: 65px;
+}
+
+.content {
+  top: 50px;
+  left: 20px;
+  position: relative;
+}

@@ -1,24 +1,24 @@
 @(username: String, auctionItem: AuctionItem)
 
 @main(username) {
-<h2>Websocket Auction Client</h2>  
+<h3>@auctionItem.name</h3>  
 <div id="onError">
 
 </div>
 <div id="output">
-  <label>Vara: @auctionItem.name</label>
-  <br>
-  <label>Nuvarande bud: </label>
+  <p>Beskrivning:</p>
+  <br><span>Nuvarande bud: </span>
   <input type="text" id="currentBid" value="@auctionItem.price">
 </div>
 <div id="input">
   <br>
-  <label>Ditt bud:</label>
+  <span>Ditt bud:</span>
   <input type="text" id="bid">
   <br><button id="bidButton">Buda</button>
+  <a href="@routes.Application.auctionList(username)">Tillbaka</a>
 </div>
 <div id="auctionhistory">
-  <h3>Lagda bud</h3>
+  <h4>Budhistorik</h4>
 </div>
 
 <script type="text/javascript" charset="utf-8">
