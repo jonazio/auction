@@ -1,0 +1,26 @@
+@(connected: String)
+
+<div class="row">
+  <div class="span12">
+    	<div class="navbar navbar-fixed-top topbar">
+            <div class="fill">
+               <div class="container">
+                    <a class="brand" href="@routes.Application.index()">Websocket Auction</a>
+                    
+                    @if(connected != null) {
+                        <p class="pull-right">
+                            Logged in as @connected —
+                            <a href="@routes.Application.index()">Disconnect</a>
+                        </p>
+                    } else {
+                        <form action="@routes.Application.auctionList()" class="pull-right">
+                            <input id="username" name="username" class="input-small" type="text" placeholder="Username">
+                            <button class="btn" type="submit">Sign in</button>
+                        </form>
+                    }
+                    
+                </div>
+            </div>
+        </div>
+    </div>    
+ </div>

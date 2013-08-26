@@ -1,10 +1,11 @@
 .leftmenu {
-  top: 40px;
-  position: relative;
-  float: left;
   background-color: lightgray;
-  height: 500px;
-  width: 65px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.menuitem {
+	margin: 5px;
 }
 
 .content {
@@ -12,3 +13,10 @@
   left: 20px;
   position: relative;
 }
+
+.outer { 
+	margin: auto;
+    width:1098px;
+    }
+
+ 

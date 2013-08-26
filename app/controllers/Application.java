@@ -18,12 +18,7 @@ public class Application extends Controller {
     public static Result index() {
         return ok(index.render());
     }
-    
-    
-    /**
-     * Display the list of items TODO
-     */
-    
+
     /**
      * Display the auction room. Remove when new solution is working TODO
      */
@@ -47,7 +42,11 @@ public class Application extends Controller {
         return ok(auctionRoom.render(username, AuctionItem.findItem(id)));
     }
     
-    
+
+     
+    /**
+     * Display the list of items TODO
+     */
     public static Result auctionList(String username){
         if(username == null || username.trim().equals("")) {
             flash("error", "Please choose a valid username.");
