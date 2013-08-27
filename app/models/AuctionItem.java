@@ -8,17 +8,25 @@ import play.data.validation.Constraints.*;
 
 import javax.persistence.*;
 
+import com.avaje.ebean.ExpressionList;
+
 @Entity
 @Table(name="Auction_Items")
 public class AuctionItem extends Model{
 	
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="item_seq")
+	@SequenceGenerator(name="item_seq", sequenceName="auction_item_id_seq", allocationSize=21)
 	public Long id;
 	
 	@Required
 	public String name;
 	
+	@Required
 	public BigDecimal price;
+	
+	@Required
+	public String owner;
 	
     public static void create (AuctionItem auctionItem) {
     	auctionItem.save();
@@ -32,12 +40,23 @@ public class AuctionItem extends Model{
     	return find.byId(id);
     }
     
-    public void update (Long id, AuctionItem auctionItem){
+    public static void update (Long id, AuctionItem auctionItem){
     	auctionItem.update(id, auctionItem);
+    }
+    
+    public static void delete (Long id) {
+    	find.ref(id).delete();
     }
     
     public static List<AuctionItem> all() {
     	return find.all();
+    }
+    
+    public static List<AuctionItem> findByOwner(String owner){
+    	List<AuctionItem> items = find.where()
+    		    .eq("owner", owner)
+    		    .findList();
+    	return items;
     }
 	
 }

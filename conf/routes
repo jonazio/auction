@@ -6,7 +6,12 @@
 GET     /                           controllers.Application.index()
 GET		/auction/:id	            controllers.Application.auctionRoom(username: String ?= null, id: Long)
 GET		/auctionList				controllers.Application.auctionList(username: String ?= null)
+GET		/newAuction					controllers.Application.newAuction(username: String ?= null)
 GET     /room/auction               controllers.Application.auction(username)
+GET		/auctionListUser			controllers.Application.auctionListUser(username: String ?= null)
+
+POST	/newAuctionItem				controllers.Application.newAuctionItem(username: String)
+POST	/auctionItem/:id/delete		controllers.Application.removeAuctionItem(username: String, id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -1,0 +1,19 @@
+@(username: String, auctionForm: Form[AuctionItem])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main(username){
+<h2>Ny auktion</h2>
+
+	@form(routes.Application.newAuctionItem(username)) {
+		
+		<label class="itemLabel">Objekt </label> <input type="text" name="name" label="Namn"><br>
+    <label class="itemLabel">Pris</label> <input type="number" name="price" value="0"><br>
+    <input type="hidden" name="owner" value="@username">
+
+		<input type="submit" value="Skapa ny auktion">
+
+	}
+
+}

@@ -1,0 +1,20 @@
+@(username: String, items: List[AuctionItem])
+
+@import helper._
+
+@main(username){
+<h2>Dina auktioner</h2>
+<div id="listOfItems">
+  <ul>
+      @for(item <- items) {
+        <li>@item.name
+          @form(routes.Application.removeAuctionItem(username, item.id)) {
+          	<input type="submit" value="Ta bort">
+          }
+        </li>  
+      }
+  </ul>  
+</div>
+
+
+}
