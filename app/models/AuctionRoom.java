@@ -34,17 +34,16 @@ public class AuctionRoom extends UntypedActor {
      * Join the default room.
      */
     public static void join(final String username, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) throws Exception{
-    	System.out.println("join");
+    	System.out.println("join: " + username);
         // Send the Join message to the room
         String result = (String)Await.result(ask(defaultItem,new Join(username, out), 1000), Duration.create(1, SECONDS));
         
         if("OK".equals(result)) {
-            System.out.println("OK!");
             // For each event received on the socket,
             in.onMessage(new Callback<JsonNode>() {
                public void invoke(JsonNode event) {
                    // Send a Bid message to the room.
-            	   defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()));         
+            	   defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()));        
                } 
             });
             
@@ -102,6 +101,15 @@ public class AuctionRoom extends UntypedActor {
             auctionItem.price = new BigDecimal(bid.bid);
             auctionItem.update();
             
+        } else if(message instanceof ItemQuery) {
+        	
+        	ItemQuery itemQuery = (ItemQuery)message;
+        	auctionItem = new AuctionItem();
+        	//auctionItem = AuctionItem.findItem(ItemQuery.id);
+        	
+        	
+        	
+        	
         } else {
             unhandled(message);
         }
@@ -113,25 +121,54 @@ public class AuctionRoom extends UntypedActor {
     	System.out.println("notifyAll");
         for(WebSocket.Out<JsonNode> channel: members.values()) {
             
-            ObjectNode event = Json.newObject();
-            System.out.println("kind " + kind);
-            event.put("kind", kind);
-            System.out.println("user " + user);
-            event.put("user", user);
-            System.out.println("text " + text);
-            event.put("message", text);
-            System.out.println("id " + id);
-            event.put("id", id);
-            
-            ArrayNode m = event.putArray("members");
+        	ObjectNode event = createMessage(kind, user, text, id);
+        	
+            // this part redundant? TODO
+            /*ArrayNode m = event.putArray("members");
             for(String u: members.keySet()) {
                 m.add(u);
-            }
+            }*/
             channel.write(event);
             System.out.println(event.toString());
             System.out.println("notifyAll - skrivit klart");
         }
     }
+    
+    public void notifyUser(String kind, String user, String text, long id) {
+    	System.out.println("notifyUser");
+    	WebSocket.Out<JsonNode> channel = members.get(user);
+    	
+    	ObjectNode event = createMessage(kind, user, text, id);
+       
+        channel.write(event);
+    	
+    }
+    
+    
+    public ObjectNode createMessage(String kind, String user, String text, long id){
+    	// write message
+    	ObjectNode event = Json.newObject();
+        System.out.println("kind " + kind);
+        event.put("kind", kind);
+        System.out.println("user " + user);
+        event.put("user", user);
+        System.out.println("text " + text);
+        event.put("message", text);
+        System.out.println("id " + id);
+        event.put("id", id);
+        return event;
+    	
+    }
+    
+    public ObjectNode itemQueryResponse (AuctionItem auctionItem){
+    	ObjectNode event = Json.newObject();
+    	event.put("id", auctionItem.id);
+    	event.put("name", auctionItem.name);
+    	event.put("price", auctionItem.price);
+    	event.put("owner", auctionItem.owner);
+    	return event;
+    }
+    
     
     // -- Messages
     
@@ -159,6 +196,18 @@ public class AuctionRoom extends UntypedActor {
             this.id = id;
         }
         
+    }
+    
+    
+    public static class ItemQuery {
+    	
+    	final String username;
+    	final long id;
+    	
+    	public ItemQuery (String username, long id){
+    		this.username = username;
+    		this.id = id;
+    	}
     }
     
 }
