@@ -41,9 +41,24 @@ public class AuctionRoom extends UntypedActor {
         if("OK".equals(result)) {
             // For each event received on the socket,
             in.onMessage(new Callback<JsonNode>() {
+            	           	
                public void invoke(JsonNode event) {
-                   // Send a Bid message to the room.
-            	   defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()));        
+
+               	System.out.println("====invoke start===="); 
+               	// determine what type of message we've received
+               	if (event.get("kind").asText().equals("bid")) {
+               		// Send a Bid message to the room.
+            		defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()));
+            	}
+               	if (event.get("kind").asText().equals("itemquery")) {
+               		// respond with an itemqueryresponse
+            		defaultItem.tell(new ItemQuery(username, event.get("id").asLong()));
+               	}
+               	if (event.get("kind").asText().equals("deleteitem")) {
+               		defaultItem.tell(new DeleteItem(username, event.get("id").asLong()));
+               	}
+                    
+            	   System.out.println("====invoke stop===="); 
                } 
             });
             
@@ -84,7 +99,7 @@ public class AuctionRoom extends UntypedActor {
            //     getSender().tell("This username is already used");
            // } else {
                 members.put(join.username, join.channel);
-                notifyAll("join", join.username, "has entered the room", 1L);
+                notifyAll(Join.JoinMessage(join.username));
                 getSender().tell("OK");
            // }
             
@@ -92,8 +107,7 @@ public class AuctionRoom extends UntypedActor {
             // Received a Bid
             Bid bid = (Bid)message;
             
-            notifyAll("bid", bid.username, bid.bid, bid.id);
-            System.out.println("onReceive - Bid - har notifierat alla");
+            notifyAll(Bid.BidMessage(bid.username, bid.bid, bid.id));
             
             // update auctionitem in database TODO
             auctionItem = new AuctionItem();
@@ -104,19 +118,30 @@ public class AuctionRoom extends UntypedActor {
         } else if(message instanceof ItemQuery) {
         	
         	ItemQuery itemQuery = (ItemQuery)message;
+        	
+        	// find item
         	auctionItem = new AuctionItem();
-        	//auctionItem = AuctionItem.findItem(ItemQuery.id);
+        	auctionItem = AuctionItem.findItem(itemQuery.id);
         	
+        	// send response to user TODO
+        	notifyUser(itemQuery.username, ItemQuery.ItemQueryResponse(auctionItem));
+        } else if(message instanceof DeleteItem) {
         	
+        	DeleteItem deleteItem = (DeleteItem)message;
         	
+        	// delete item
+        	auctionItem.delete(deleteItem.id);
         	
+        	notifyUser(deleteItem.username, DeleteItem.DeleteItemResponse(deleteItem.id));
+ 	
         } else {
             unhandled(message);
+            System.out.println("unhandled message");
         }
         
-    }
+    } 
     
-    // Send a Json event to all members
+    // Send a Json event to all members, remove this function later on TODO
     public void notifyAll(String kind, String user, String text, long id) {
     	System.out.println("notifyAll");
         for(WebSocket.Out<JsonNode> channel: members.values()) {
@@ -134,14 +159,28 @@ public class AuctionRoom extends UntypedActor {
         }
     }
     
-    public void notifyUser(String kind, String user, String text, long id) {
-    	System.out.println("notifyUser");
-    	WebSocket.Out<JsonNode> channel = members.get(user);
-    	
-    	ObjectNode event = createMessage(kind, user, text, id);
-       
-        channel.write(event);
-    	
+    // Send a Json event to all members
+    public void notifyAll(ObjectNode event) {
+    	System.out.println("notifyAll");
+        for(WebSocket.Out<JsonNode> channel: members.values()) {
+            
+        	
+            // this part redundant? TODO
+            /*ArrayNode m = event.putArray("members");
+            for(String u: members.keySet()) {
+                m.add(u);
+            }*/
+            channel.write(event);
+            System.out.println(event.toString());
+            System.out.println("notifyAll - skrivit klart");
+        }
+    }
+    
+    public void notifyUser(String user, ObjectNode event) {
+    	System.out.println("notifyUser " + user);
+    	WebSocket.Out<JsonNode> channel = members.get(user);   
+    	System.out.println(event.toString());
+        channel.write(event);  	
     }
     
     
@@ -159,16 +198,7 @@ public class AuctionRoom extends UntypedActor {
         return event;
     	
     }
-    
-    public ObjectNode itemQueryResponse (AuctionItem auctionItem){
-    	ObjectNode event = Json.newObject();
-    	event.put("id", auctionItem.id);
-    	event.put("name", auctionItem.name);
-    	event.put("price", auctionItem.price);
-    	event.put("owner", auctionItem.owner);
-    	return event;
-    }
-    
+     
     
     // -- Messages
     
@@ -180,6 +210,14 @@ public class AuctionRoom extends UntypedActor {
         public Join(String username, WebSocket.Out<JsonNode> channel) {
             this.username = username;
             this.channel = channel;
+        }
+        
+        public static ObjectNode JoinMessage(String username){
+        	ObjectNode event = Json.newObject();
+            event.put("kind", "join");
+            event.put("user", username);
+            event.put("message", "has entered the room");
+            return event;        	
         }
         
     }
@@ -196,8 +234,16 @@ public class AuctionRoom extends UntypedActor {
             this.id = id;
         }
         
+        public static ObjectNode BidMessage(String username, String bid, Long id){
+        	ObjectNode event = Json.newObject();
+            event.put("kind", "bid");
+            event.put("user", username);
+            event.put("message", bid);
+            event.put("id", id);
+            return event;
+        }
+        
     }
-    
     
     public static class ItemQuery {
     	
@@ -208,6 +254,35 @@ public class AuctionRoom extends UntypedActor {
     		this.username = username;
     		this.id = id;
     	}
+    	
+    	public static ObjectNode ItemQueryResponse(AuctionItem auctionItem){
+        	ObjectNode event = Json.newObject();
+        	event.put("kind", "ItemQueryResponse");
+        	event.put("id", auctionItem.id);
+        	event.put("name", auctionItem.name);
+        	event.put("price", auctionItem.price);
+        	event.put("owner", auctionItem.owner);
+        	return event;
+    	}
+    }
+    
+    public static class DeleteItem {
+    	
+    	final String username;
+    	final long id;
+    	
+    	public DeleteItem (String username, long id){
+    		this.username = username;
+    		this.id = id;
+    	}
+    	
+    	public static ObjectNode DeleteItemResponse(long id){
+    		ObjectNode event = Json.newObject();
+        	event.put("kind", "DeleteItemResponse");
+        	event.put("id", id);
+        	return event;	
+    	}
+    	
     }
     
 }
