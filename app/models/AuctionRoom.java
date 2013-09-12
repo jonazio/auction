@@ -30,9 +30,9 @@ public class AuctionRoom extends UntypedActor {
     AuctionItem auctionItem;
     
     static {
-        //new Robot(defaultItem, "Hal", 3);
-        //new Robot(defaultItem, "Optimus", 2);
-        //new Robot(defaultItem, "Data", 4);
+        new Robot(defaultItem, "Hal", 3);
+        new Robot(defaultItem, "Optimus", 2);
+        new Robot(defaultItem, "Data", 4);
     }
     
     
@@ -50,7 +50,6 @@ public class AuctionRoom extends UntypedActor {
             	           	
                public void invoke(JsonNode event) {
 
-               	System.out.println("====invoke start===="); 
                	// determine what type of message we've received
                	if (event.get("kind").asText().equals("bid")) {
                		// Send a Bid message to the room.
@@ -64,7 +63,6 @@ public class AuctionRoom extends UntypedActor {
                		defaultItem.tell(new DeleteItem(username, event.get("id").asLong()), null);
                	}
                     
-            	   System.out.println("====invoke stop===="); 
                } 
             });
             
@@ -92,9 +90,7 @@ public class AuctionRoom extends UntypedActor {
     Map<String, WebSocket.Out<JsonNode>> members = new HashMap<String, WebSocket.Out<JsonNode>>();
     
     public void onReceive(Object message) throws Exception {
-        
-    	System.out.println("onReceive");
-    	
+            	
         if(message instanceof Join) {
             
             // Received a Join message
@@ -119,6 +115,7 @@ public class AuctionRoom extends UntypedActor {
             auctionItem = new AuctionItem();
             auctionItem = AuctionItem.findItem(bid.id); // Fix TODO
             auctionItem.price = new BigDecimal(bid.bid);
+            auctionItem.bidder = bid.username;
             auctionItem.update();
             
         } else if(message instanceof ItemQuery) {
@@ -161,7 +158,6 @@ public class AuctionRoom extends UntypedActor {
             }*/
             channel.write(event);
             System.out.println(event.toString());
-            System.out.println("notifyAll - skrivit klart");
         }
     }
     
@@ -178,7 +174,6 @@ public class AuctionRoom extends UntypedActor {
             }*/
             channel.write(event);
             System.out.println(event.toString());
-            System.out.println("notifyAll - skrivit klart");
         }
     }
     
@@ -193,13 +188,9 @@ public class AuctionRoom extends UntypedActor {
     public ObjectNode createMessage(String kind, String user, String text, long id){
     	// write message
     	ObjectNode event = Json.newObject();
-        System.out.println("kind " + kind);
         event.put("kind", kind);
-        System.out.println("user " + user);
         event.put("user", user);
-        System.out.println("text " + text);
         event.put("message", text);
-        System.out.println("id " + id);
         event.put("id", id);
         return event;
     	

@@ -28,6 +28,8 @@ public class AuctionItem extends Model{
 	@Required
 	public String owner;
 	
+	public String bidder;
+	
     public static void create (AuctionItem auctionItem) {
     	auctionItem.save();
     }

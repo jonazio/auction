@@ -3,14 +3,61 @@
 @main(username){
 <h2>Aktuella auktioner</h2>
 <div id="listOfItems">
-  <ul>
+<table class="fixed">
+<tr>
+	<th>Objekt</th>
+	<th>Högsta Budgivare</th>
+	<th>Pris</th>
+	<th>Buda</th>
+</tr>
       @for(item <- items) {
-        <li>@item.name
-          <a href="@routes.Application.auctionRoom(username, item.id)">Buda</a>
-        </li>  
+      <tr id="i@item.id">
+        <td>@item.name</td>
+        <td>@item.bidder</td>
+        <td>@item.price kr</td>
+        <td><a href="@routes.Application.auctionRoom(username, item.id)">Buda</a></td>     
+        </tr>   
       }
-  </ul>  
+
+</table>
 </div>
+
+<script type="text/javascript" charset="utf-8">
+    
+        $(function() {
+            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+	        var auctionSocket = new WS("@routes.Application.auction(username).webSocketURL(request)")
+
+            var receiveEvent = function(event) {
+                var data = JSON.parse(event.data)
+                
+                // Handle errors
+                if(data.error) {
+                	auctionSocket.close()
+                    $("#onError span").text(data.error)
+                    $("#onError").show()
+                    return
+                } 
+                
+                if (data.kind == 'bid') {
+                	var id = "i" + data.id
+                	if ($('#' + id).exists()){
+                		$('#' + id + ' td:eq(2)').text(data.message + ' kr')
+                		$('#' + id + ' td:eq(1)').text(data.user)
+                	}
+                }
+                
+            }
+            
+            $.fn.exists = function () {
+                return this.length !== 0;
+            }
+            
+            auctionSocket.onmessage = receiveEvent
+            
+        })
+    
+    </script>
 
 
 }
