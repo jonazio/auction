@@ -59,4 +59,11 @@ public class AuctionItem extends Model{
     	return items;
     }
 	
+    public static List<AuctionItem> findNotOwnedBy(String owner){
+    	List<AuctionItem> items = find.where()
+    			.ne("owner", owner)
+    			.findList();
+    	return items;
+    }
+    
 }

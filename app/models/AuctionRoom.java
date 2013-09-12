@@ -29,6 +29,12 @@ public class AuctionRoom extends UntypedActor {
     // Item belonging to the Room
     AuctionItem auctionItem;
     
+    static {
+        //new Robot(defaultItem, "Hal", 3);
+        //new Robot(defaultItem, "Optimus", 2);
+        //new Robot(defaultItem, "Data", 4);
+    }
+    
     
     /**
      * Join the default room.
@@ -48,14 +54,14 @@ public class AuctionRoom extends UntypedActor {
                	// determine what type of message we've received
                	if (event.get("kind").asText().equals("bid")) {
                		// Send a Bid message to the room.
-            		defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()));
+            		defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()), null);
             	}
                	if (event.get("kind").asText().equals("itemquery")) {
                		// respond with an itemqueryresponse
-            		defaultItem.tell(new ItemQuery(username, event.get("id").asLong()));
+            		defaultItem.tell(new ItemQuery(username, event.get("id").asLong()), null);
                	}
                	if (event.get("kind").asText().equals("deleteitem")) {
-               		defaultItem.tell(new DeleteItem(username, event.get("id").asLong()));
+               		defaultItem.tell(new DeleteItem(username, event.get("id").asLong()), null);
                	}
                     
             	   System.out.println("====invoke stop===="); 
@@ -100,7 +106,7 @@ public class AuctionRoom extends UntypedActor {
            // } else {
                 members.put(join.username, join.channel);
                 notifyAll(Join.JoinMessage(join.username));
-                getSender().tell("OK");
+                getSender().tell("OK", getSender());
            // }
             
         } else if(message instanceof Bid)  {
@@ -130,7 +136,7 @@ public class AuctionRoom extends UntypedActor {
         	DeleteItem deleteItem = (DeleteItem)message;
         	
         	// delete item
-        	auctionItem.delete(deleteItem.id);
+        	AuctionItem.delete(deleteItem.id);
         	
         	notifyUser(deleteItem.username, DeleteItem.DeleteItemResponse(deleteItem.id));
  	
