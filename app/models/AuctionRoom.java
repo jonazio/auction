@@ -30,9 +30,9 @@ public class AuctionRoom extends UntypedActor {
     AuctionItem auctionItem;
     
     static {
-        new Robot(defaultItem, "Hal", 3);
-        new Robot(defaultItem, "Optimus", 2);
-        new Robot(defaultItem, "Data", 4);
+        //new Robot(defaultItem, "Hal", 3);
+        //new Robot(defaultItem, "Optimus", 2);
+        //new Robot(defaultItem, "Data", 4);
     }
     
     
@@ -46,22 +46,30 @@ public class AuctionRoom extends UntypedActor {
         
         if("OK".equals(result)) {
             // For each event received on the socket,
+        	
             in.onMessage(new Callback<JsonNode>() {
             	           	
                public void invoke(JsonNode event) {
-
+            	   	System.out.println("invoke");
+            	   	System.out.println(event.get("kind").asText());
                	// determine what type of message we've received
                	if (event.get("kind").asText().equals("bid")) {
                		// Send a Bid message to the room.
             		defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()), null);
             	}
-               	if (event.get("kind").asText().equals("itemquery")) {
+               	if (event.get("kind").asText().equals("getitemrequest")) {
                		// respond with an itemqueryresponse
-            		defaultItem.tell(new ItemQuery(username, event.get("id").asLong()), null);
+            		defaultItem.tell(new GetItem(username, event.get("id").asLong()), null);
                	}
-               	if (event.get("kind").asText().equals("deleteitem")) {
+               	if (event.get("kind").asText().equals("deleteitemrequest")) {
                		defaultItem.tell(new DeleteItem(username, event.get("id").asLong()), null);
                	}
+               	if (event.get("kind").asText().equals("getallitemsrequest")) {
+               		defaultItem.tell(new GetAllItems(username), null);
+            	}
+               	if (event.get("kind").asText().equals("newauctionrequest")) {
+               		defaultItem.tell(new NewItem(username, event.get("name").asText(), new BigDecimal(event.get("price").asText())), null);
+            	}
                     
                } 
             });
@@ -90,7 +98,7 @@ public class AuctionRoom extends UntypedActor {
     Map<String, WebSocket.Out<JsonNode>> members = new HashMap<String, WebSocket.Out<JsonNode>>();
     
     public void onReceive(Object message) throws Exception {
-            	
+            	System.out.println("onreceive");
         if(message instanceof Join) {
             
             // Received a Join message
@@ -118,16 +126,25 @@ public class AuctionRoom extends UntypedActor {
             auctionItem.bidder = bid.username;
             auctionItem.update();
             
-        } else if(message instanceof ItemQuery) {
+        } else if(message instanceof GetItem) {
         	
-        	ItemQuery itemQuery = (ItemQuery)message;
+        	GetItem getItem = (GetItem)message;
         	
         	// find item
         	auctionItem = new AuctionItem();
-        	auctionItem = AuctionItem.findItem(itemQuery.id);
+        	auctionItem = AuctionItem.findItem(getItem.id);
         	
         	// send response to user TODO
-        	notifyUser(itemQuery.username, ItemQuery.ItemQueryResponse(auctionItem));
+        	notifyUser(getItem.username, GetItem.getItemResponse(auctionItem));
+        } else if (message instanceof GetAllItems) {
+        	
+        	GetAllItems getAllItems = (GetAllItems)message;
+        	
+        	// find all items
+        	List<AuctionItem> auctionItems = AuctionItem.findAllItems();
+        	
+        	notifyUser(getAllItems.username, GetAllItems.getAllItemsResponse(auctionItems));
+        	
         } else if(message instanceof DeleteItem) {
         	
         	DeleteItem deleteItem = (DeleteItem)message;
@@ -137,7 +154,16 @@ public class AuctionRoom extends UntypedActor {
         	
         	notifyUser(deleteItem.username, DeleteItem.DeleteItemResponse(deleteItem.id));
  	
-        } else {
+        } else if(message instanceof NewItem){
+        	
+        	NewItem newItem = (NewItem)message;
+        	
+        	AuctionItem.create(newItem.auctionItem);
+        	
+        	notifyAll(NewItem.NewItemResponse(newItem.auctionItem));
+        	
+        }
+        else {
             unhandled(message);
             System.out.println("unhandled message");
         }
@@ -242,25 +268,54 @@ public class AuctionRoom extends UntypedActor {
         
     }
     
-    public static class ItemQuery {
+    public static class GetItem {
     	
     	final String username;
     	final long id;
     	
-    	public ItemQuery (String username, long id){
+    	public GetItem (String username, long id){
     		this.username = username;
     		this.id = id;
     	}
     	
-    	public static ObjectNode ItemQueryResponse(AuctionItem auctionItem){
+    	public static ObjectNode getItemResponse(AuctionItem auctionItem){
         	ObjectNode event = Json.newObject();
-        	event.put("kind", "ItemQueryResponse");
+        	event.put("kind", "getitemresponse");
         	event.put("id", auctionItem.id);
         	event.put("name", auctionItem.name);
         	event.put("price", auctionItem.price);
         	event.put("owner", auctionItem.owner);
         	return event;
     	}
+    	
+    	public static ObjectNode getItemData (AuctionItem auctionItem){
+    		ObjectNode event = Json.newObject();
+        	event.put("id", auctionItem.id);
+        	event.put("name", auctionItem.name);
+        	event.put("price", auctionItem.price);
+        	event.put("owner", auctionItem.owner);
+        	return event;
+    	}
+    }
+    
+    public static class GetAllItems {
+    	
+    	final String username;
+    	
+    	public GetAllItems (String username){
+    		this.username = username;
+    	}
+    	
+    	public static ObjectNode getAllItemsResponse(List<AuctionItem> auctionItems) {
+    		ObjectNode event = Json.newObject();
+    		event.put("kind", "getallitemsresponse");
+    		System.out.println(auctionItems.size());
+    		
+    		for (int a = 0; a < auctionItems.size(); a++){
+    			event.put("item " + a, GetItem.getItemData(auctionItems.get(a)));
+    		}
+    		return event;
+    	}	
     }
     
     public static class DeleteItem {
@@ -275,11 +330,34 @@ public class AuctionRoom extends UntypedActor {
     	
     	public static ObjectNode DeleteItemResponse(long id){
     		ObjectNode event = Json.newObject();
-        	event.put("kind", "DeleteItemResponse");
+        	event.put("kind", "deleteitemresponse");
         	event.put("id", id);
         	return event;	
     	}
     	
     }
     
+    
+    public static class NewItem {
+    	
+    	final AuctionItem auctionItem;
+    	
+    	public NewItem(String owner, String name, BigDecimal price){
+    		auctionItem = new AuctionItem();
+    		auctionItem.owner = owner;
+    		auctionItem.name = name;
+    		auctionItem.price = price;
+    	}
+    	
+    	public static ObjectNode NewItemResponse(AuctionItem auctionItem){
+    		ObjectNode event = Json.newObject();
+    		event.put("kind", "newitemresponse");
+    		event.put("id", auctionItem.id);
+    		event.put("name", auctionItem.name);
+    		event.put("price", auctionItem.price);
+    		event.put("owner", auctionItem.owner);
+    		return event;
+    	}
+    	
+    }
 }

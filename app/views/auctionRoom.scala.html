@@ -34,9 +34,9 @@
                 $("#bid").val('')
             }
             
-            var itemQuery = function() {
+            var testFunction = function() {
             	auctionSocket.send(JSON.stringify(
-            				{kind: "deleteitem", id: @auctionItem.id}
+            				{kind: "newauctionrequest", name: "Anabola", price: "100"}
             			))
             	$("#bid").val('')
             };

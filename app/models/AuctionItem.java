@@ -68,4 +68,9 @@ public class AuctionItem extends Model{
     	return items;
     }
     
+    public static List<AuctionItem> findAllItems() {
+    	List<AuctionItem> items = find.all();
+    	return items;
+    }
+    
 }
