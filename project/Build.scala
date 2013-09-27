@@ -12,7 +12,8 @@ object ApplicationBuild extends Build {
     // Add your project dependencies here,
     javaCore,
     javaJdbc,
-    javaEbean
+    javaEbean,
+    "org.apache.activemq" % "activemq-core" % "5.5.1"
   )
 
   //  val main = play.Project(appName, appVersion, appDependencies)  -- old

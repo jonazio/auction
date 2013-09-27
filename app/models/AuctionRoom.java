@@ -29,6 +29,9 @@ public class AuctionRoom extends UntypedActor {
     // Item belonging to the Room
     AuctionItem auctionItem;
     
+    // Test
+    //static JMSConsumer jmsConsumer = new JMSConsumer();
+    
     static {
         //new Robot(defaultItem, "Hal", 3);
         //new Robot(defaultItem, "Optimus", 2);
@@ -41,6 +44,8 @@ public class AuctionRoom extends UntypedActor {
      */
     public static void join(final String username, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) throws Exception{
     	System.out.println("join: " + username);
+    	
+    	//jmsConsumer.consume();
         // Send the Join message to the room
         String result = (String)Await.result(ask(defaultItem,new Join(username, out), 1000), Duration.create(1, SECONDS));
         
