@@ -33,9 +33,9 @@ public class AuctionRoom extends UntypedActor {
     //static JMSConsumer jmsConsumer = new JMSConsumer();
     
     static {
-        //new Robot(defaultItem, "Hal", 3);
-        //new Robot(defaultItem, "Optimus", 2);
-        //new Robot(defaultItem, "Data", 4);
+        new Robot(defaultItem, "Hal", 3);
+        new Robot(defaultItem, "Optimus", 2);
+        new Robot(defaultItem, "Data", 4);
     }
     
     
