@@ -314,11 +314,14 @@ public class AuctionRoom extends UntypedActor {
     	public static ObjectNode getAllItemsResponse(List<AuctionItem> auctionItems) {
     		ObjectNode event = Json.newObject();
     		event.put("kind", "getallitemsresponse");
-    		System.out.println(auctionItems.size());
-    		
+    		//System.out.println(auctionItems.size());
+    		final JsonNodeFactory factory = JsonNodeFactory.instance;
+    		ArrayNode list = new ArrayNode(factory);
     		for (int a = 0; a < auctionItems.size(); a++){
-    			event.put("item " + a, GetItem.getItemData(auctionItems.get(a)));
+    			//event.put("item " + a, GetItem.getItemData(auctionItems.get(a)));
+    			list.add(GetItem.getItemData(auctionItems.get(a)));
     		}
+    		event.put("items", (JsonNode)list);
     		return event;
     	}	
     }
