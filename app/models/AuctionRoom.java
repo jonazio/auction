@@ -33,9 +33,9 @@ public class AuctionRoom extends UntypedActor {
     //static JMSConsumer jmsConsumer = new JMSConsumer();
     
     static {
-        new Robot(defaultItem, "Hal", 3);
-        new Robot(defaultItem, "Optimus", 2);
-        new Robot(defaultItem, "Data", 4);
+        new Robot(defaultItem, "Sigvard", 3);
+        new Robot(defaultItem, "Gösta", 2);
+        new Robot(defaultItem, "Nils-Erik", 4);
     }
     
     
@@ -60,7 +60,7 @@ public class AuctionRoom extends UntypedActor {
                	// determine what type of message we've received
                	if (event.get("kind").asText().equals("bid")) {
                		// Send a Bid message to the room.
-            		defaultItem.tell(new Bid(username, event.get("bid").asText(), event.get("id").asLong()), null);
+            		defaultItem.tell(new Bid(username, event.get("price").asText(), event.get("id").asLong()), null);
             	}
                	if (event.get("kind").asText().equals("getitemrequest")) {
                		// respond with an itemqueryresponse
@@ -266,7 +266,7 @@ public class AuctionRoom extends UntypedActor {
         	ObjectNode event = Json.newObject();
             event.put("kind", "bid");
             event.put("user", username);
-            event.put("message", bid);
+            event.put("price", bid);
             event.put("id", id);
             return event;
         }
@@ -290,6 +290,7 @@ public class AuctionRoom extends UntypedActor {
         	event.put("name", auctionItem.name);
         	event.put("price", auctionItem.price);
         	event.put("owner", auctionItem.owner);
+        	event.put("bidder", auctionItem.bidder);
         	return event;
     	}
     	
@@ -299,6 +300,7 @@ public class AuctionRoom extends UntypedActor {
         	event.put("name", auctionItem.name);
         	event.put("price", auctionItem.price);
         	event.put("owner", auctionItem.owner);
+        	event.put("bidder", auctionItem.bidder);
         	return event;
     	}
     }

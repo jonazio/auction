@@ -6,7 +6,7 @@
 <table class="fixed">
 <tr>
 	<th>Objekt</th>
-	<th>Högsta Budgivare</th>
+	<th>Hï¿½gsta Budgivare</th>
 	<th>Pris</th>
 	<th>Buda</th>
 </tr>
@@ -42,7 +42,7 @@
                 if (data.kind == 'bid') {
                 	var id = "i" + data.id
                 	if ($('#' + id).exists()){
-                		$('#' + id + ' td:eq(2)').text(data.message + ' kr')
+                		$('#' + id + ' td:eq(2)').text(data.price + ' kr')
                 		$('#' + id + ' td:eq(1)').text(data.user)
                 	}
                 }

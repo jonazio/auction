@@ -29,7 +29,7 @@
             
             var sendMessage = function() {
             	auctionSocket.send(JSON.stringify(
-                    {kind: "bid", bid: $("#bid").val(), id: @auctionItem.id}
+                    {kind: "bid", price: $("#bid").val(), id: @auctionItem.id}
                 ))
                 $("#bid").val('')
             }
@@ -54,7 +54,7 @@
                 
                 if (data.kind == 'bid') {
                 	if (data.id == @auctionItem.id) {
-										 $("#currentBid").val(data.message)
+										 $("#currentBid").val(data.price)
 											var el = $('<div class="message"><p></p></div>')
 	                    $("span", el).text(data.user)
 	                    var today = new Date()
@@ -63,7 +63,7 @@
 											var s = today.getSeconds()
 											m=checkTime(m);
 											s=checkTime(s);
-	                    $("p", el).text(h+":"+m+":"+s+": "+ data.user + " budade " + data.message + " kr.")
+	                    $("p", el).text(h+":"+m+":"+s+": "+ data.user + " budade " + data.price + " kr.")
 	                    $(el).addClass(data.kind)
 	                    if(data.user == '@username') $(el).addClass('me')
 	                    $('#auctionhistory').append(el)
