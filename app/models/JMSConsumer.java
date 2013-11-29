@@ -3,6 +3,8 @@ package models;
 import javax.jms.*;  
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import akka.actor.ActorRef;
+
 //JMS Consumer
 public class JMSConsumer {
          public void consume() {
@@ -12,7 +14,7 @@ public class JMSConsumer {
                  Connection connection = factory.createConnection();
                   Session session = connection.createSession(false,
                       Session.AUTO_ACKNOWLEDGE);
-                   Topic topic = session.createTopic("stock");
+                   Topic topic = session.createTopic("bid_in");
                    MessageConsumer consumer = session.createConsumer(topic);
                    JMSMessageListener listener = new JMSMessageListener();
                    consumer.setMessageListener(listener);

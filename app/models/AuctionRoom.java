@@ -24,18 +24,18 @@ import static java.util.concurrent.TimeUnit.*;
 public class AuctionRoom extends UntypedActor {
     
     // Default room.
-    static ActorRef defaultItem = Akka.system().actorOf(new Props(AuctionRoom.class));
+    public static ActorRef defaultItem = Akka.system().actorOf(new Props(AuctionRoom.class));
     
     // Item belonging to the Room
     AuctionItem auctionItem;
     
     // Test
-    //static JMSConsumer jmsConsumer = new JMSConsumer();
+    static JMSConsumer jmsConsumer = new JMSConsumer();
     
     static {
         //new Robot(defaultItem, "Sigvard", 3);
         //new Robot(defaultItem, "Gösta", 2);
-        //new Robot(defaultItem, "Nils-Erik", 4);
+        //Robot(defaultItem, "Nils-Erik", 4);
     }
     
     
@@ -45,7 +45,7 @@ public class AuctionRoom extends UntypedActor {
     public static void join(final String username, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) throws Exception{
     	System.out.println("join: " + username);
     	
-    	//jmsConsumer.consume();
+    	jmsConsumer.consume();
         // Send the Join message to the room
         String result = (String)Await.result(ask(defaultItem,new Join(username, out), 1000), Duration.create(1, SECONDS));
         
