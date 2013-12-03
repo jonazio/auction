@@ -29,8 +29,9 @@ public class AuctionRoom extends UntypedActor {
     // Item belonging to the Room
     AuctionItem auctionItem;
     
-    // Test
+    // JMS QUEUE
     public static JMSConsumer jmsConsumer = new JMSConsumer();
+    public static JMSProducer jmsProducer = new JMSProducer();
     
     static {
         //new Robot(defaultItem, "Sigvard", 3);

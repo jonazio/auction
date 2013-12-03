@@ -11,6 +11,7 @@ public class Global extends GlobalSettings{
 	public void onStart(Application app){
 		Logger.info("====== Application has started =======");
 		AuctionRoom.jmsConsumer.consume();
+		AuctionRoom.jmsProducer.produce();
 	}
 
 }

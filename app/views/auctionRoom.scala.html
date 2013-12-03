@@ -24,7 +24,7 @@
 <script type="text/javascript" charset="utf-8">
     
         $(function() {
-            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+          var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
 	        var auctionSocket = new WS("@routes.Application.auction(username).webSocketURL(request)")
             
             var sendMessage = function() {

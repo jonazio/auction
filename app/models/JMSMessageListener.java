@@ -20,6 +20,8 @@ public class JMSMessageListener implements MessageListener {
     		  System.out.println(textMessage.getText());
     		  
     		  defaultItem.tell(new Bid("Tomas", "101", 1L));
+    		  
+    		  AuctionRoom.jmsProducer.sendMsg("This is a test!");
     	  } catch (JMSException e){
     		  e.printStackTrace();
     	  }
